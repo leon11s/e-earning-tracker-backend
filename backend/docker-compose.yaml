@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  elearntracker-backend:
+    build: ./src
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - ./src/:/usr/src/app/
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://elearn:elearnadmin@db/elearntracking
+  db:
+    image: postgres:12.1-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=elearn
+      - POSTGRES_PASSWORD=elearnadmin
+      - POSTGRES_DB=elearntracking
+
+volumes:
+  postgres_data:
