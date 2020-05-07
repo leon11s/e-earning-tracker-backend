@@ -35,3 +35,7 @@ class User(UserInDBBase):
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+# check if email o is used
+class UserDataExists(BaseModel):
+    exists: bool

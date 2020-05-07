@@ -25,8 +25,8 @@ def create_user(*, user_in: schemas.user.UserCreate, db: Session = Depends(deps.
         raise HTTPException(status_code=400, detail="The user with this username already exists in the system.")
     user = crud_user.create_user(db, user=user_in)
     # Tukaj dodamo pošiljanje mailov
-
     return user
+
 
 @router.get("/me/", response_model=schemas.user.User)
 def read_users_me(current_user: schemas.user.User = Depends(deps.get_current_active_user)):
@@ -34,3 +34,21 @@ def read_users_me(current_user: schemas.user.User = Depends(deps.get_current_act
     Get current user.
     """
     return current_user
+
+
+@router.get("/emailexist", response_model=schemas.user.UserDataExists)
+def check_if_email_exists(email: str, db: Session = Depends(deps.get_db)):
+    user_by_email = crud_user.get_user_by_email(db, email=email)
+    if user_by_email:
+        return {"exists": True}
+    else:
+        return {"exists": False}
+
+
+@router.get("/usernameexist", response_model=schemas.user.UserDataExists)
+def check_if_username_exists(username: str, db: Session = Depends(deps.get_db)):
+    user_by_username = crud_user.get_user_by_username(db, username=username)
+    if user_by_username:
+        return {"exists": True}
+    else:
+        return {"exists": False}
