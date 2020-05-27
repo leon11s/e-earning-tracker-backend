@@ -25,11 +25,12 @@ def delete_course(db_session: Session, course_id: int, user_id: int):
     db_session.commit()
     return course_db
 
-
-
-
-# def put_update_device(db_session: Session, db_device: schemas.Device, device_update: schemas.DeviceBase):
-#     db_device.device_name = device_update.device_name
-#     db_device.description = device_update.description
-#     db_session.commit()
-#     return db_devicer
+def update_course(db_session: Session, db_course: courses.Course, course_update: courses.CourseCreate):
+    db_course.course_provider = course_update.course_provider
+    db_course.course_name = course_update.course_name
+    db_course.course_start_date = course_update.course_start_date
+    db_course.course_status = course_update.course_status
+    db_course.course_URL = course_update.course_URL
+    db_course.course_payment_type = course_update.course_payment_type
+    db_session.commit()
+    return db_course
