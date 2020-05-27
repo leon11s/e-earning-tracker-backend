@@ -13,4 +13,4 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     is_active = Column(Boolean(), default=True)
     created_date = Column(DateTime, default=func.now(), nullable=False)
-    #courses = relationship("Courses", back_populates="owner")
+    courses = relationship("Course", back_populates="users")

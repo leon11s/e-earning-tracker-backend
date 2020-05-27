@@ -1,41 +1,53 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 
+from sqlalchemy.orm import Session
+
+from app import schemas, models
+from app.crud import crud_course
+from app.api import deps
 
 router = APIRouter()
 
-@router.get("/")
-def test_course():
-    return {"endpoit":"course"}
+@router.post("/", response_model=schemas.courses.Course, status_code=201)
+def create_course(course: schemas.courses.CourseCreate, 
+                db: Session = Depends(deps.get_db), 
+                current_user: schemas.user.User = Depends(deps.get_current_active_user)):
+    return crud_course.create_course(db_session=db, course=course, user=current_user)
 
 
-# @router.get("/", response_model=List[schemas.Course]) # TODO: dodaj auth za endpoint 
-# def read_devices(db: Session = Depends(get_db)):
-#     """
-#     Read all courses for current user.
-#     """
-#     courses = crud.get_courses(db)
-#     return courses
-
-# @router.post("/", response_model=schemas.Course, status_code=201) # TODO: dodaj auth za endpoint 
-# def create_device(course: schemas.CourseCreate, db: Session = Depends(get_db)):
-#     return crud.create_course(db_session=db, course=course)
+@router.get("/", response_model=List[schemas.courses.Course])
+def read_courses(db: Session = Depends(deps.get_db), 
+                current_user: schemas.user.User = Depends(deps.get_current_active_user)):
+    """
+    Read all courses for current user.
+    """
+    courses = crud_course.get_courses(db_session=db, user_id=current_user.user_id)
+    return courses
 
 
+@router.delete("/{course_id}", response_model=schemas.courses.Course)
+def delete_course(course_id: int, 
+                    db: Session = Depends(deps.get_db), 
+                    current_user: schemas.user.User = Depends(deps.get_current_active_user)):
+    db_course = crud_course.get_course(db_session=db, course_id=course_id, user_id=current_user.user_id)
+    if not db_course:
+        raise HTTPException(status_code=404, detail="Course not found.")
+    db_course = crud_course.delete_course(db_session=db, course_id=course_id, user_id=current_user.user_id)
+    return db_course
 
-# @router_devices.get("/{device_id}", response_model=schemas.Device)
-# def read_device(device_id: int, db: Session = Depends(get_db)):
-#     db_device = crud.get_device(db_session=db, device_id=device_id)
-#     if not db_device:
-#         raise HTTPException(status_code=404, detail="Device not found.")
-#     return db_device
 
-# @router_devices.delete("/{device_id}", response_model=schemas.Device)
-# def delete_device(device_id: int, db: Session = Depends(get_db)):
-#     db_device = crud.get_device(db_session=db, device_id=device_id)
-#     if not db_device:
-#         raise HTTPException(status_code=404, detail="Device not found.")
-#     db_device = crud.delete_device(db_session=db, device_id=device_id)
-#     return db_device
+@router.get("/{course_id}", response_model=schemas.courses.Course)
+def read_device(course_id: int, 
+                db: Session = Depends(deps.get_db),
+                current_user: schemas.user.User = Depends(deps.get_current_active_user)):
+    db_course = crud_course.get_course(db_session=db, user_id=current_user.user_id, course_id=course_id)
+    if not db_course:
+        raise HTTPException(status_code=404, detail="Course not found.")
+    return db_course
+
+
 
 # @router_devices.put("/{device_id}", response_model=schemas.Device)
 # def update_device(device_id: int, device_update: schemas.DeviceBase, db: Session = Depends(get_db)):
