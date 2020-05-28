@@ -24,7 +24,6 @@ def create_user(*, user_in: schemas.user.UserCreate, db: Session = Depends(deps.
     if user_by_username:
         raise HTTPException(status_code=400, detail="The user with this username already exists in the system.")
     user = crud_user.create_user(db, user=user_in)
-    # Tukaj dodamo pošiljanje mailov
     return user
 
 

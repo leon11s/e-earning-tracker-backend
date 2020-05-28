@@ -20,9 +20,6 @@ def create_course(course: schemas.courses.CourseCreate,
 @router.get("/", response_model=List[schemas.courses.Course])
 def read_courses(db: Session = Depends(deps.get_db), 
                 current_user: schemas.user.User = Depends(deps.get_current_active_user)):
-    """
-    Read all courses for current user.
-    """
     courses = crud_course.get_courses(db_session=db, user_id=current_user.user_id)
     return courses
 
@@ -53,8 +50,6 @@ def update_course(course_id: int,
                   course: schemas.courses.CourseUpdate, 
                   db: Session = Depends(deps.get_db), 
                   current_user: schemas.user.User = Depends(deps.get_current_active_user)):
-    print(course, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee<')
-    #check if course exists
     db_course = crud_course.get_course(db_session=db, user_id=current_user.user_id, course_id=course_id)
     if not db_course:
         raise HTTPException(status_code=404, detail="Course not found.")
